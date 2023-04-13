@@ -10,12 +10,13 @@ package udp
 import (
 	"context"
 	"fmt"
-	"net"
-
 	"github.com/sirupsen/logrus"
+	"github.com/slackhq/nebula/component/dialer"
 	"github.com/slackhq/nebula/config"
 	"github.com/slackhq/nebula/firewall"
 	"github.com/slackhq/nebula/header"
+	"github.com/slackhq/nebula/util"
+	"net"
 )
 
 type Conn struct {
@@ -25,7 +26,18 @@ type Conn struct {
 
 func NewListener(l *logrus.Logger, ip net.IP, port int, multi bool, batch int) (*Conn, error) {
 	lc := NewListenConfig(multi)
-	pc, err := lc.ListenPacket(context.TODO(), "udp", net.JoinHostPort(ip.String(), fmt.Sprintf("%v", port)))
+	address := net.JoinHostPort(ip.String(), fmt.Sprintf("%v", port))
+	interfaceName, _, err := util.InitInterface()
+	if err != nil {
+		return nil, err
+	}
+	addr, err := dialer.BindIfaceToListenConfig(interfaceName, &lc, "udp", net.JoinHostPort(ip.String(), fmt.Sprintf("%v", port)))
+	if err != nil {
+		return nil, err
+	}
+	address = addr
+
+	pc, err := lc.ListenPacket(context.TODO(), "udp", address)
 	if err != nil {
 		return nil, err
 	}
