@@ -73,7 +73,7 @@ func BindIfaceToListenConfig(ifaceName string, lc *net.ListenConfig, _, address 
 
 func netInterfaceListener() {
 	for {
-		time.Sleep(5 * time.Second)
+		time.Sleep(2 * time.Second)
 		_, indexStr, err := util.InitInterface()
 		if err == nil {
 			index, errInt := strconv.Atoi(indexStr)
