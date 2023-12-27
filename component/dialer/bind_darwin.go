@@ -1,14 +1,12 @@
 package dialer
 
 import (
-	"net"
-	"strconv"
-	"syscall"
-	"time"
-
+	"fmt"
 	"github.com/slackhq/nebula/component/iface"
 	"github.com/slackhq/nebula/util"
 	"golang.org/x/sys/unix"
+	"net"
+	"syscall"
 )
 
 type controlFn = func(network, address string, c syscall.RawConn) error
@@ -23,21 +21,24 @@ func bindControl(chain controlFn) controlFn {
 			}
 		}()
 
-		ipStr, _, err := net.SplitHostPort(address)
-		if err == nil {
-			ip := net.ParseIP(ipStr)
-			if ip != nil && !ip.IsGlobalUnicast() {
-				return
-			}
-		}
+		//ipStr, _, err := net.SplitHostPort(address)
+		//if err == nil {
+		//	ip := net.ParseIP(ipStr)
+		//	if ip != nil && !ip.IsGlobalUnicast() {
+		//		fmt.Println("=====================================")
+		//		return
+		//	}
+		//}
 
 		var innerErr error
 		err = c.Control(func(fd uintptr) {
+			fmt.Println("=====================================", fd)
 			switch network {
 			case "tcp4", "udp4":
-				innerErr = unix.SetsockoptInt(int(fd), unix.IPPROTO_IP, unix.IP_BOUND_IF, ifaceIdx)
+				fmt.Println("=====================================", util.InterfaceIndex)
+				innerErr = unix.SetsockoptInt(int(fd), unix.IPPROTO_IP, unix.IP_BOUND_IF, util.InterfaceIndex)
 			case "tcp6", "udp6":
-				innerErr = unix.SetsockoptInt(int(fd), unix.IPPROTO_IPV6, unix.IPV6_BOUND_IF, ifaceIdx)
+				innerErr = unix.SetsockoptInt(int(fd), unix.IPPROTO_IPV6, unix.IPV6_BOUND_IF, util.InterfaceIndex)
 			}
 		})
 
@@ -66,20 +67,5 @@ func BindIfaceToListenConfig(ifaceName string, lc *net.ListenConfig, _, address 
 	}
 	ifaceIdx = ifaceObj.Index
 	lc.Control = bindControl(lc.Control)
-	// 开启监听
-	go netInterfaceListener()
 	return address, nil
-}
-
-func netInterfaceListener() {
-	for {
-		time.Sleep(2 * time.Second)
-		_, indexStr, err := util.InitInterface()
-		if err == nil {
-			index, errInt := strconv.Atoi(indexStr)
-			if errInt != nil {
-				ifaceIdx = index
-			}
-		}
-	}
 }

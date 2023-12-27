@@ -1,0 +1,97 @@
+pki:
+  ca: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CkEKD09sYU9sYS5jaGF0IFRMRCiowfGiBjCoqPaxBjog0p+i/6qfQENLotm75u6/
+    3g1Ms5Xw7jKO9HANQaC93dJAARJAfhzd7aG1wsOiOIHHwOYRJPzuN6nW9ZuYQu7/
+    W37JiKbe3mPc9PhjoVKOhgiteDYeWhT6XE6xGnwqmEETsJVYBw==
+    -----END NEBULA CERTIFICATE-----
+  cert: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CmgKCmppZXl1MjUwLjMSCoP09+AKgID8/w8olKLLqwYwp6j2sQY6IOUqyG2pUrvE
+    t+HSMGjURr/6IOc+ejSl4yMaKScWr5VaSiCejRAOBB9GjQ+5YNpPJpZNecPvpOli
+    43e0KNdNyQDcFBJAeXhCYic8GIhrNzKmdhclVK4feMeRWLwfihirfHgJnx6P/Gli
+    jhf68IcPQuGV2VjC2R0hExGeS93Mar1OqwI1Ag==
+    -----END NEBULA CERTIFICATE-----
+  key: |
+    -----BEGIN NEBULA X25519 PRIVATE KEY-----
+    /U4JmHqUQ9dKLq0aqKnCdcXooV1JEZCgkvlq/jhmSNw=
+    -----END NEBULA X25519 PRIVATE KEY-----
+static_host_map:
+  172.29.29.1: ["47.254.231.183:4242"]
+  172.29.1.1: ["120.79.92.255:4242"]
+  172.29.3.1: ["61.183.129.50:4242"]
+  172.29.4.1: ["223.76.184.188:4243"]
+lighthouse:
+  am_lighthouse: false
+  serve_dns: false
+  dns:
+    host: ""
+    port: 0
+  interval: 60
+  hosts:
+    - 172.29.29.1
+    - 172.29.1.1
+listen:
+  host: 0.0.0.0
+  port: 4242
+  batch: 64
+  read_buffer: 0
+  write_buffer: 0
+punchy:
+  punch: true
+  respond: false
+  delay: 1s
+cipher: aes
+local_range: ""
+sshd:
+  enabled: false
+  listen: ""
+  host_key: ""
+  authorized_users: []
+tun:
+  dev: tun1
+  drop_local_broadcast: true
+  drop_multicast: true
+  tx_queue: 500
+  mtu: 1300
+  routes: []
+  unsafe_routes:
+    - route: 192.168.11.0/24
+      via: 172.29.3.1
+logging:
+  level: debug
+  format: text
+stats:
+  type: ""
+  interval: ""
+  prefix: ""
+  protocol: ""
+  host: ""
+  listen: ""
+  path: ""
+  namespace: ""
+  subsystem: ""
+handshakes:
+  try_interval: 100ms
+  retries: 20
+  wait_rotation: 5
+firewall:
+  conntrack:
+    tcp_timeout: 120h
+    udp_timeout: 3m
+    default_timeout: 10m
+    max_connections: 100000
+  outbound:
+    - port: any
+      proto: any
+      host: any
+  inbound:
+    - port: any
+      host: any
+      proto: any
+
+
+relay:
+  relays:
+    - 172.29.29.1
+  use_relays: false

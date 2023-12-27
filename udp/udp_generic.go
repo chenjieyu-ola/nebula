@@ -25,9 +25,11 @@ type Conn struct {
 }
 
 func NewListener(l *logrus.Logger, ip net.IP, port int, multi bool, batch int) (*Conn, error) {
+	interfaceName, _, err := util.InitInterface()
+	// 开启监听
+	go util.NetInterfaceListener()
 	lc := NewListenConfig(multi)
 	address := net.JoinHostPort(ip.String(), fmt.Sprintf("%v", port))
-	interfaceName, _, err := util.InitInterface()
 	if err != nil {
 		return nil, err
 	}
